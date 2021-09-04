@@ -40,7 +40,7 @@ export default {
   },
   watch: {
     $route: {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         this.selectedLabelDefault = newVal.path
       },
       immediate:true
