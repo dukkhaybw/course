@@ -5,6 +5,12 @@ import store from './store'
 import './assets/reset.css'
 import './cube-ui'
 import 'amfe-flexible'
+import filters from './utils/filters.js'
+
+//定义全局过滤器
+Object.keys(filters).forEach(filterName => {
+    Vue.filter(filterName, filters[filterName])
+})
 
 Vue.config.productionTip = false
 

@@ -1,4 +1,6 @@
 import axios from 'axios'
+import store from '@/store/index'
+import * as TYPES from '@/store/actions-type.js'
 import { Toast } from 'cube-ui'
 
 class AjaxRequest {
@@ -12,7 +14,6 @@ class AjaxRequest {
         if (!this.hasOwnProperty('toast')) {
             this.toast = Toast.$create({
                 txt: 'Loading...',
-                mask: true,
                 time: 0
             })
         }
@@ -25,6 +26,16 @@ class AjaxRequest {
     setInterceptor(instance, url) {
         //请求拦截器
         instance.interceptors.request.use((config) => {
+            //订阅请求的取消函数
+            let CancelToken = axios.CancelToken
+            config.cancelToken = new CancelToken(function executor(c) {
+                store.commit(TYPES.SET_PUSH_AJAXREQUEST, c)
+            })
+
+            //携带token
+            config.headers.token = localStorage.getItem('token') || ''
+
+            //展示请求等待的toast组件
             if (Object.keys(this.queue).length === 0) {
                 this.toast.show()
             }
@@ -39,6 +50,7 @@ class AjaxRequest {
             delete this.queue[url]
             if (Object.keys(this.queue).length === 0) {
                 this.toast.hide()
+                store.commit(TYPES.SET_CLEAR_AJAXREQUEST)
             }
             if (result.data.code === 0) {
                 return result.data.data
